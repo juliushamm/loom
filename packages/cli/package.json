@@ -2,7 +2,31 @@
   "name": "@juliushamm/loom",
   "version": "0.1.0",
   "license": "MIT",
-  "description": "Linear to PR pipeline CLI. Drive Claude Code against Linear issues with configurable gates.",
+  "description": "Weaves Linear into your automated agent-team workflow. Claude Code starter kit for Linear → PR pipelines with dev-team meetings and a paranoid dispatch-review gate.",
+  "author": "Julius Hamm",
+  "homepage": "https://github.com/juliushamm/loom#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliushamm/loom.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/juliushamm/loom/issues"
+  },
+  "keywords": [
+    "linear",
+    "claude",
+    "claude-code",
+    "pipeline",
+    "automation",
+    "pr",
+    "agent",
+    "subagent",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
@@ -13,13 +37,16 @@
     "loom": "./dist/bin/loom.js"
   },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && chmod +x dist/bin/loom.js dist/src/hooks/check-path.js dist/src/hooks/check-bash.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
+    "prepublishOnly": "npm run build && npm test",
     "loom": "tsx bin/loom.ts"
   },
   "devDependencies": {
