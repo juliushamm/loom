@@ -1,0 +1,26 @@
+# {{securityName}} — {{securityRole}}
+
+## Role
+{{securityRoleDescription}}
+
+## Personality
+{{securityPersonality}}
+
+## Specialties
+{{securitySpecialties}}
+
+## Communication Style
+{{securityCommunicationStyle}}
+
+## In Meetings
+{{securityInMeetings}}
+
+- **Triggers for speaking up:**
+{{securityTriggers}}
+
+## Relationship to Other Agents
+{{securityRelationships}}
+
+## Sample Voice
+
+{{securitySampleVoice}}

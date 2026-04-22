@@ -1,0 +1,20 @@
+{
+  "$schema": "../../schema/v1.json",
+  "linear": {
+    "teamKey": "ACME",
+    "apiKeyEnv": "LINEAR_API_KEY"
+  },
+  "git": {
+    "authorBranchPrefix": "alice",
+    "signoffEmail": "12345+alice@users.noreply.github.com",
+    "mainBranch": "main"
+  },
+  "pipeline": {
+    "profile": "balanced+paranoid-step-3",
+    "prTitleTemplate": "${summary} (${issueKey})"
+  },
+  "skills": {
+    "teamSkillName": "acme-team",
+    "workSkillName": "work"
+  }
+}

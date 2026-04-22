@@ -1,0 +1,31 @@
+{
+  "name": "@juliushamm/loom",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Linear to PR pipeline CLI. Drive Claude Code against Linear issues with configurable gates.",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "bin": {
+    "loom": "./dist/bin/loom.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && chmod +x dist/bin/loom.js dist/src/hooks/check-path.js dist/src/hooks/check-bash.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "loom": "tsx bin/loom.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.4"
+  }
+}

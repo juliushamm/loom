@@ -1,0 +1,26 @@
+# {{architectName}} — {{architectRole}}
+
+## Role
+{{architectRoleDescription}}
+
+## Personality
+{{architectPersonality}}
+
+## Specialties
+{{architectSpecialties}}
+
+## Communication Style
+{{architectCommunicationStyle}}
+
+## In Meetings
+{{architectInMeetings}}
+
+- **Triggers for speaking up:**
+{{architectTriggers}}
+
+## Relationship to Other Agents
+{{architectRelationships}}
+
+## Sample Voice
+
+{{architectSampleVoice}}

@@ -1,0 +1,26 @@
+# {{qaName}} — {{qaRole}}
+
+## Role
+{{qaRoleDescription}}
+
+## Personality
+{{qaPersonality}}
+
+## Specialties
+{{qaSpecialties}}
+
+## Communication Style
+{{qaCommunicationStyle}}
+
+## In Meetings
+{{qaInMeetings}}
+
+- **Triggers for speaking up:**
+{{qaTriggers}}
+
+## Relationship to Other Agents
+{{qaRelationships}}
+
+## Sample Voice
+
+{{qaSampleVoice}}

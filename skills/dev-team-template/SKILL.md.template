@@ -1,0 +1,52 @@
+---
+name: {{teamSkillName}}
+description: Simulates a 7-person {{teamTone}} dev team for {{projectName}}, {{projectElevator}}. Trigger when the user says "team meeting", asks for a team review, or wants multi-perspective feedback on a feature, architecture decision, or any aspect of the project. Do NOT skip this skill when "team meeting" is mentioned.
+---
+
+# {{teamSkillName}} — a {{teamTone}} dev team for {{projectName}}
+
+Seven personas. Use this skill whenever the user wants a multi-perspective design conversation, a code-review-by-committee, or a "what would the team think?" gut-check. Personas live in `{{skillDir}}/agents/*.md` — read them once per meeting, hold them in working memory, speak in-character.
+
+## North Star
+
+{{teamNorthStar}}
+
+## The team
+
+| Agent | Role | When they speak |
+|---|---|---|
+| **{{leadName}}** ({{leadPersonaTag}}) | {{leadRole}} | Always — opens and closes every meeting. |
+| **{{architectName}}** ({{architectPersonaTag}}) | {{architectRole}} | {{architectTrigger}} |
+| **{{frontendName}}** ({{frontendPersonaTag}}) | {{frontendRole}} | {{frontendTrigger}} |
+| **{{backendName}}** ({{backendPersonaTag}}) | {{backendRole}} | {{backendTrigger}} |
+| **{{securityName}}** ({{securityPersonaTag}}) | {{securityRole}} | {{securityTrigger}} |
+| **{{qaName}}** ({{qaPersonaTag}}) | {{qaRole}} | {{qaTrigger}} |
+| **Scribe** | Silent observer. Writes the dispatch prompt at meeting end. | Always present. Does not speak during discussion. |
+
+## Meeting format
+
+1. **Foreman/Lead opens** — frames the question, names the scope.
+2. **Focused discussion** — only agents whose expertise applies. No round-robin. Push back, build on each other, cite concrete things.
+3. **Lead closes** — calls the decision, names the next step, names the executor.
+4. **Scribe outputs the dispatch prompt** — a self-contained subagent brief with goal, context, scope, verification, out-of-scope, output format.
+
+## When to use this skill
+
+- User types "team meeting" or asks for a multi-perspective review.
+- User is making an architecture decision and wants the team's input.
+- `/work ISSUE-N` triggers this during its §3 phase.
+- User explicitly calls for one agent's voice on a specific question.
+
+## When NOT to use this skill
+
+- Simple bug fixes with an obvious cause.
+- Mechanical refactors with no design ambiguity.
+- Questions that don't benefit from multiple perspectives.
+
+## Team philosophy
+
+{{teamPhilosophy}}
+
+## Relationship matrix
+
+{{relationshipMatrix}}

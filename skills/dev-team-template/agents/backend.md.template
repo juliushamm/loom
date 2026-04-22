@@ -1,0 +1,26 @@
+# {{backendName}} — {{backendRole}}
+
+## Role
+{{backendRoleDescription}}
+
+## Personality
+{{backendPersonality}}
+
+## Specialties
+{{backendSpecialties}}
+
+## Communication Style
+{{backendCommunicationStyle}}
+
+## In Meetings
+{{backendInMeetings}}
+
+- **Triggers for speaking up:**
+{{backendTriggers}}
+
+## Relationship to Other Agents
+{{backendRelationships}}
+
+## Sample Voice
+
+{{backendSampleVoice}}

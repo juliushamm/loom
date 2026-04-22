@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/juliushamm/loom/schema/v1.json",
+  "title": "Loom config (v1)",
+  "description": "Per-repo configuration for the @juliushamm/loom CLI. Only linear.teamKey is required; everything else has a sensible default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["linear"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "linear": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["teamKey"],
+      "properties": {
+        "teamKey": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "Linear team key, e.g. ENG, RIFT, PLAT."
+        },
+        "apiKeyEnv": {
+          "type": "string",
+          "default": "LINEAR_API_KEY",
+          "description": "Environment variable that holds the Linear API key."
+        }
+      }
+    },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authorBranchPrefix": { "type": "string", "default": "feat/" },
+        "signoffEmail": { "type": "string", "default": "" },
+        "mainBranch": { "type": "string", "default": "main" }
+      }
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "root": { "type": "string", "default": "." },
+        "workspaceDir": { "type": "string", "default": "." }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profile": {
+          "type": "string",
+          "enum": ["aggressive", "balanced", "paranoid", "balanced+paranoid-step-3"],
+          "default": "balanced+paranoid-step-3"
+        },
+        "prTitleTemplate": {
+          "type": "string",
+          "default": "${summary} (${issueKey})",
+          "description": "Template with ${summary} and ${issueKey} placeholders."
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "teamSkillName": { "type": "string", "default": "dev-team" },
+        "workSkillName": { "type": "string", "default": "work" }
+      }
+    },
+    "tier1": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blockedPaths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Glob-ish patterns blocked by the pre-tool-use hook. Trailing / means directory prefix; bare extensions like '.pem' match file suffixes; plain names match basenames. Defaults include .github/workflows/, .claude/skills/, CLAUDE.md, package-lock.json, .env, .pem, .key, credentials, build/, dist/, node_modules/."
+        }
+      }
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dispatchOk": { "type": "string", "default": "automation:dispatch-ok" },
+        "dispatchReject": { "type": "string", "default": "automation:dispatch-reject" },
+        "halt": { "type": "string", "default": "automation:halt" },
+        "haltAll": { "type": "string", "default": "automation:halt-all" },
+        "inFlight": { "type": "string", "default": "automation:in-flight" },
+        "mergeOk": { "type": "string", "default": "automation:merge-ok" },
+        "dispatchPendingReview": {
+          "type": "string",
+          "default": "automation:dispatch-pending-review"
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "logDir": { "type": "string", "default": "~/.loom/logs" },
+        "lockDir": { "type": "string", "default": "~/.loom/locks" },
+        "haltFile": { "type": "string", "default": ".loom-halt" }
+      }
+    }
+  }
+}
