@@ -1,49 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
   <defs>
-    <radialGradient id="bg" gradientUnits="userSpaceOnUse" cx="360" cy="320" r="720">
+    <radialGradient id="bg" gradientUnits="userSpaceOnUse" cx="320" cy="320" r="720">
       <stop offset="0%"   stop-color="#0f0b2e"/>
       <stop offset="55%"  stop-color="#05041a"/>
       <stop offset="100%" stop-color="#010108"/>
     </radialGradient>
 
-    <radialGradient id="innerGlow" gradientUnits="userSpaceOnUse" cx="360" cy="320" r="190">
+    <radialGradient id="innerGlow" gradientUnits="userSpaceOnUse" cx="320" cy="320" r="250">
       <stop offset="0%"   stop-color="#a5b4fc" stop-opacity="0.35"/>
       <stop offset="55%"  stop-color="#6366f1" stop-opacity="0.12"/>
       <stop offset="100%" stop-color="#3730a3" stop-opacity="0"/>
     </radialGradient>
 
-    <!-- Thread gradients aligned to the actual thread extents.
-         Warps run vertically from y=100 to y=540.
-         Wefts run horizontally from x=140 to x=580. -->
-    <linearGradient id="warp" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="540">
+    <!-- Thread gradients span the expanded weave (40 → 600 in x, 40 → 600 in y) -->
+    <linearGradient id="warp" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="600">
       <stop offset="0%"   stop-color="#7d82e8" stop-opacity="0.95"/>
       <stop offset="50%"  stop-color="#5E6AD2" stop-opacity="0.98"/>
       <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0.92"/>
     </linearGradient>
-    <linearGradient id="weft" gradientUnits="userSpaceOnUse" x1="140" y1="0" x2="580" y2="0">
+    <linearGradient id="weft" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="600" y2="0">
       <stop offset="0%"   stop-color="#4338ca" stop-opacity="0.92"/>
       <stop offset="50%"  stop-color="#6366f1" stop-opacity="0.96"/>
       <stop offset="100%" stop-color="#312e81" stop-opacity="0.92"/>
     </linearGradient>
-    <linearGradient id="warpHi" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="540">
+    <linearGradient id="warpHi" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="600">
       <stop offset="0%"   stop-color="#c7d2fe" stop-opacity="0"/>
       <stop offset="35%"  stop-color="#e0e7ff" stop-opacity="0.55"/>
       <stop offset="65%"  stop-color="#a5b4fc" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="weftHi" gradientUnits="userSpaceOnUse" x1="140" y1="0" x2="580" y2="0">
+    <linearGradient id="weftHi" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="600" y2="0">
       <stop offset="0%"   stop-color="#c7d2fe" stop-opacity="0"/>
       <stop offset="35%"  stop-color="#e0e7ff" stop-opacity="0.5"/>
       <stop offset="65%"  stop-color="#a5b4fc" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Soft edge: heavily blurred circular mask — the weave dissolves into the backdrop -->
     <filter id="edgeBlur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="28"/>
+      <feGaussianBlur stdDeviation="32"/>
     </filter>
+    <radialGradient id="ghostFalloff" gradientUnits="userSpaceOnUse" cx="320" cy="320" r="340">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="45%"  stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
     <mask id="weaveFade">
-      <circle cx="360" cy="320" r="185" fill="#ffffff" filter="url(#edgeBlur)"/>
+      <rect width="1280" height="640" fill="url(#ghostFalloff)"/>
+      <circle cx="320" cy="320" r="213" fill="#ffffff" filter="url(#edgeBlur)"/>
     </mask>
 
     <linearGradient id="text" x1="0" y1="0" x2="0" y2="1">
@@ -55,70 +58,93 @@
   <rect width="1280" height="640" fill="url(#bg)"/>
   <rect width="1280" height="640" fill="url(#innerGlow)"/>
 
-  <!-- Woven icon, centered at (360, 320), softly masked into the backdrop -->
-  <g mask="url(#weaveFade)" transform="rotate(45 360 320)">
+  <!-- Woven icon centered at (320, 320). 11×11 threads at spacing 56. -->
+  <g mask="url(#weaveFade)" transform="rotate(45 320 320)">
     <g stroke="url(#weft)" stroke-width="16" stroke-linecap="round">
-      <line x1="140" y1="152" x2="580" y2="152"/>
-      <line x1="140" y1="208" x2="580" y2="208"/>
-      <line x1="140" y1="264" x2="580" y2="264"/>
-      <line x1="140" y1="320" x2="580" y2="320"/>
-      <line x1="140" y1="376" x2="580" y2="376"/>
-      <line x1="140" y1="432" x2="580" y2="432"/>
-      <line x1="140" y1="488" x2="580" y2="488"/>
+      <line x1="40" y1="40"  x2="600" y2="40"/>
+      <line x1="40" y1="96"  x2="600" y2="96"/>
+      <line x1="40" y1="152" x2="600" y2="152"/>
+      <line x1="40" y1="208" x2="600" y2="208"/>
+      <line x1="40" y1="264" x2="600" y2="264"/>
+      <line x1="40" y1="320" x2="600" y2="320"/>
+      <line x1="40" y1="376" x2="600" y2="376"/>
+      <line x1="40" y1="432" x2="600" y2="432"/>
+      <line x1="40" y1="488" x2="600" y2="488"/>
+      <line x1="40" y1="544" x2="600" y2="544"/>
+      <line x1="40" y1="600" x2="600" y2="600"/>
     </g>
     <g stroke="url(#weftHi)" stroke-width="5" stroke-linecap="round">
-      <line x1="140" y1="147" x2="580" y2="147"/>
-      <line x1="140" y1="203" x2="580" y2="203"/>
-      <line x1="140" y1="259" x2="580" y2="259"/>
-      <line x1="140" y1="315" x2="580" y2="315"/>
-      <line x1="140" y1="371" x2="580" y2="371"/>
-      <line x1="140" y1="427" x2="580" y2="427"/>
-      <line x1="140" y1="483" x2="580" y2="483"/>
+      <line x1="40" y1="35"  x2="600" y2="35"/>
+      <line x1="40" y1="91"  x2="600" y2="91"/>
+      <line x1="40" y1="147" x2="600" y2="147"/>
+      <line x1="40" y1="203" x2="600" y2="203"/>
+      <line x1="40" y1="259" x2="600" y2="259"/>
+      <line x1="40" y1="315" x2="600" y2="315"/>
+      <line x1="40" y1="371" x2="600" y2="371"/>
+      <line x1="40" y1="427" x2="600" y2="427"/>
+      <line x1="40" y1="483" x2="600" y2="483"/>
+      <line x1="40" y1="539" x2="600" y2="539"/>
+      <line x1="40" y1="595" x2="600" y2="595"/>
     </g>
 
     <g stroke="url(#warp)" stroke-width="16" stroke-linecap="round">
-      <line x1="192" y1="100" x2="192" y2="540"/>
-      <line x1="248" y1="100" x2="248" y2="540"/>
-      <line x1="304" y1="100" x2="304" y2="540"/>
-      <line x1="360" y1="100" x2="360" y2="540"/>
-      <line x1="416" y1="100" x2="416" y2="540"/>
-      <line x1="472" y1="100" x2="472" y2="540"/>
-      <line x1="528" y1="100" x2="528" y2="540"/>
+      <line x1="40"  y1="40" x2="40"  y2="600"/>
+      <line x1="96"  y1="40" x2="96"  y2="600"/>
+      <line x1="152" y1="40" x2="152" y2="600"/>
+      <line x1="208" y1="40" x2="208" y2="600"/>
+      <line x1="264" y1="40" x2="264" y2="600"/>
+      <line x1="320" y1="40" x2="320" y2="600"/>
+      <line x1="376" y1="40" x2="376" y2="600"/>
+      <line x1="432" y1="40" x2="432" y2="600"/>
+      <line x1="488" y1="40" x2="488" y2="600"/>
+      <line x1="544" y1="40" x2="544" y2="600"/>
+      <line x1="600" y1="40" x2="600" y2="600"/>
     </g>
     <g stroke="url(#warpHi)" stroke-width="5" stroke-linecap="round">
-      <line x1="187" y1="100" x2="187" y2="540"/>
-      <line x1="243" y1="100" x2="243" y2="540"/>
-      <line x1="299" y1="100" x2="299" y2="540"/>
-      <line x1="355" y1="100" x2="355" y2="540"/>
-      <line x1="411" y1="100" x2="411" y2="540"/>
-      <line x1="467" y1="100" x2="467" y2="540"/>
-      <line x1="523" y1="100" x2="523" y2="540"/>
+      <line x1="35"  y1="40" x2="35"  y2="600"/>
+      <line x1="91"  y1="40" x2="91"  y2="600"/>
+      <line x1="147" y1="40" x2="147" y2="600"/>
+      <line x1="203" y1="40" x2="203" y2="600"/>
+      <line x1="259" y1="40" x2="259" y2="600"/>
+      <line x1="315" y1="40" x2="315" y2="600"/>
+      <line x1="371" y1="40" x2="371" y2="600"/>
+      <line x1="427" y1="40" x2="427" y2="600"/>
+      <line x1="483" y1="40" x2="483" y2="600"/>
+      <line x1="539" y1="40" x2="539" y2="600"/>
+      <line x1="595" y1="40" x2="595" y2="600"/>
     </g>
 
+    <!-- Weft-over segments. Each segment centered on (col_x, row_y), half-width 18. -->
     <g stroke="url(#weft)" stroke-width="16" stroke-linecap="round">
-      <line x1="174" y1="152" x2="210" y2="152"/><line x1="286" y1="152" x2="322" y2="152"/><line x1="398" y1="152" x2="434" y2="152"/><line x1="510" y1="152" x2="546" y2="152"/>
-      <line x1="230" y1="208" x2="266" y2="208"/><line x1="342" y1="208" x2="378" y2="208"/><line x1="454" y1="208" x2="490" y2="208"/>
-      <line x1="174" y1="264" x2="210" y2="264"/><line x1="286" y1="264" x2="322" y2="264"/><line x1="398" y1="264" x2="434" y2="264"/><line x1="510" y1="264" x2="546" y2="264"/>
-      <line x1="230" y1="320" x2="266" y2="320"/><line x1="342" y1="320" x2="378" y2="320"/><line x1="454" y1="320" x2="490" y2="320"/>
-      <line x1="174" y1="376" x2="210" y2="376"/><line x1="286" y1="376" x2="322" y2="376"/><line x1="398" y1="376" x2="434" y2="376"/><line x1="510" y1="376" x2="546" y2="376"/>
-      <line x1="230" y1="432" x2="266" y2="432"/><line x1="342" y1="432" x2="378" y2="432"/><line x1="454" y1="432" x2="490" y2="432"/>
-      <line x1="174" y1="488" x2="210" y2="488"/><line x1="286" y1="488" x2="322" y2="488"/><line x1="398" y1="488" x2="434" y2="488"/><line x1="510" y1="488" x2="546" y2="488"/>
-    </g>
-    <g stroke="url(#weftHi)" stroke-width="5" stroke-linecap="round">
-      <line x1="174" y1="147" x2="210" y2="147"/><line x1="286" y1="147" x2="322" y2="147"/><line x1="398" y1="147" x2="434" y2="147"/><line x1="510" y1="147" x2="546" y2="147"/>
-      <line x1="230" y1="203" x2="266" y2="203"/><line x1="342" y1="203" x2="378" y2="203"/><line x1="454" y1="203" x2="490" y2="203"/>
-      <line x1="174" y1="259" x2="210" y2="259"/><line x1="286" y1="259" x2="322" y2="259"/><line x1="398" y1="259" x2="434" y2="259"/><line x1="510" y1="259" x2="546" y2="259"/>
-      <line x1="230" y1="315" x2="266" y2="315"/><line x1="342" y1="315" x2="378" y2="315"/><line x1="454" y1="315" x2="490" y2="315"/>
-      <line x1="174" y1="371" x2="210" y2="371"/><line x1="286" y1="371" x2="322" y2="371"/><line x1="398" y1="371" x2="434" y2="371"/><line x1="510" y1="371" x2="546" y2="371"/>
-      <line x1="230" y1="427" x2="266" y2="427"/><line x1="342" y1="427" x2="378" y2="427"/><line x1="454" y1="427" x2="490" y2="427"/>
-      <line x1="174" y1="483" x2="210" y2="483"/><line x1="286" y1="483" x2="322" y2="483"/><line x1="398" y1="483" x2="434" y2="483"/><line x1="510" y1="483" x2="546" y2="483"/>
+      <!-- Row 0 y=40 : cols 0,2,4,6,8,10 → x = 40,152,264,376,488,600 -->
+      <line x1="22"  y1="40" x2="58"  y2="40"/><line x1="134" y1="40" x2="170" y2="40"/><line x1="246" y1="40" x2="282" y2="40"/><line x1="358" y1="40" x2="394" y2="40"/><line x1="470" y1="40" x2="506" y2="40"/><line x1="582" y1="40" x2="618" y2="40"/>
+      <!-- Row 1 y=96 : cols 1,3,5,7,9 → x = 96,208,320,432,544 -->
+      <line x1="78"  y1="96" x2="114" y2="96"/><line x1="190" y1="96" x2="226" y2="96"/><line x1="302" y1="96" x2="338" y2="96"/><line x1="414" y1="96" x2="450" y2="96"/><line x1="526" y1="96" x2="562" y2="96"/>
+      <!-- Row 2 y=152 -->
+      <line x1="22"  y1="152" x2="58"  y2="152"/><line x1="134" y1="152" x2="170" y2="152"/><line x1="246" y1="152" x2="282" y2="152"/><line x1="358" y1="152" x2="394" y2="152"/><line x1="470" y1="152" x2="506" y2="152"/><line x1="582" y1="152" x2="618" y2="152"/>
+      <!-- Row 3 y=208 -->
+      <line x1="78"  y1="208" x2="114" y2="208"/><line x1="190" y1="208" x2="226" y2="208"/><line x1="302" y1="208" x2="338" y2="208"/><line x1="414" y1="208" x2="450" y2="208"/><line x1="526" y1="208" x2="562" y2="208"/>
+      <!-- Row 4 y=264 -->
+      <line x1="22"  y1="264" x2="58"  y2="264"/><line x1="134" y1="264" x2="170" y2="264"/><line x1="246" y1="264" x2="282" y2="264"/><line x1="358" y1="264" x2="394" y2="264"/><line x1="470" y1="264" x2="506" y2="264"/><line x1="582" y1="264" x2="618" y2="264"/>
+      <!-- Row 5 y=320 -->
+      <line x1="78"  y1="320" x2="114" y2="320"/><line x1="190" y1="320" x2="226" y2="320"/><line x1="302" y1="320" x2="338" y2="320"/><line x1="414" y1="320" x2="450" y2="320"/><line x1="526" y1="320" x2="562" y2="320"/>
+      <!-- Row 6 y=376 -->
+      <line x1="22"  y1="376" x2="58"  y2="376"/><line x1="134" y1="376" x2="170" y2="376"/><line x1="246" y1="376" x2="282" y2="376"/><line x1="358" y1="376" x2="394" y2="376"/><line x1="470" y1="376" x2="506" y2="376"/><line x1="582" y1="376" x2="618" y2="376"/>
+      <!-- Row 7 y=432 -->
+      <line x1="78"  y1="432" x2="114" y2="432"/><line x1="190" y1="432" x2="226" y2="432"/><line x1="302" y1="432" x2="338" y2="432"/><line x1="414" y1="432" x2="450" y2="432"/><line x1="526" y1="432" x2="562" y2="432"/>
+      <!-- Row 8 y=488 -->
+      <line x1="22"  y1="488" x2="58"  y2="488"/><line x1="134" y1="488" x2="170" y2="488"/><line x1="246" y1="488" x2="282" y2="488"/><line x1="358" y1="488" x2="394" y2="488"/><line x1="470" y1="488" x2="506" y2="488"/><line x1="582" y1="488" x2="618" y2="488"/>
+      <!-- Row 9 y=544 -->
+      <line x1="78"  y1="544" x2="114" y2="544"/><line x1="190" y1="544" x2="226" y2="544"/><line x1="302" y1="544" x2="338" y2="544"/><line x1="414" y1="544" x2="450" y2="544"/><line x1="526" y1="544" x2="562" y2="544"/>
+      <!-- Row 10 y=600 -->
+      <line x1="22"  y1="600" x2="58"  y2="600"/><line x1="134" y1="600" x2="170" y2="600"/><line x1="246" y1="600" x2="282" y2="600"/><line x1="358" y1="600" x2="394" y2="600"/><line x1="470" y1="600" x2="506" y2="600"/><line x1="582" y1="600" x2="618" y2="600"/>
     </g>
   </g>
 
   <!-- Wordmark + tagline -->
   <g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
-    <text x="660" y="308" font-size="180" font-weight="700" letter-spacing="-6" fill="url(#text)">loom</text>
-    <text x="664" y="360" font-size="22" font-weight="500" letter-spacing="0.2" fill="#a5b4fc" opacity="0.9">Weaves Linear into your automated agent-team workflow.</text>
-    <text x="664" y="396" font-size="17" font-weight="400" letter-spacing="2" fill="#6366f1" opacity="0.75">/work ISSUE-42  →  team meeting  →  PR</text>
+    <text x="620" y="308" font-size="180" font-weight="700" letter-spacing="-6" fill="url(#text)">loom</text>
+    <text x="624" y="360" font-size="22" font-weight="500" letter-spacing="0.2" fill="#a5b4fc" opacity="0.9">Weaves Linear into your automated agent-team workflow.</text>
+    <text x="624" y="396" font-size="17" font-weight="400" letter-spacing="2" fill="#6366f1" opacity="0.75">/work ISSUE-42  →  team meeting  →  PR</text>
   </g>
 </svg>

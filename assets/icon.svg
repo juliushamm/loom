@@ -1,134 +1,153 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Tile: near-black, faint indigo pooling toward center -->
     <radialGradient id="bg" cx="50%" cy="50%" r="72%">
       <stop offset="0%"  stop-color="#0e0a28"/>
       <stop offset="55%" stop-color="#05041a"/>
       <stop offset="100%" stop-color="#020108"/>
     </radialGradient>
 
-    <!-- Inner glow — something luminous suspended behind the weave -->
     <radialGradient id="innerGlow" cx="50%" cy="50%" r="28%">
       <stop offset="0%"   stop-color="#a5b4fc" stop-opacity="0.35"/>
       <stop offset="50%"  stop-color="#6366f1" stop-opacity="0.12"/>
       <stop offset="100%" stop-color="#3730a3" stop-opacity="0"/>
     </radialGradient>
 
-    <!-- Thread gradients along each axis. With the weave rotated 45°, in its
-         local frame warp is vertical and weft is horizontal as usual. -->
-    <linearGradient id="warp" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="432">
+    <!-- Thread gradients span the full expanded weave (16 → 496) -->
+    <linearGradient id="warp" gradientUnits="userSpaceOnUse" x1="0" y1="16" x2="0" y2="496">
       <stop offset="0%"   stop-color="#7d82e8" stop-opacity="0.95"/>
       <stop offset="50%"  stop-color="#5E6AD2" stop-opacity="0.98"/>
       <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0.92"/>
     </linearGradient>
-    <linearGradient id="weft" gradientUnits="userSpaceOnUse" x1="80" y1="0" x2="432" y2="0">
+    <linearGradient id="weft" gradientUnits="userSpaceOnUse" x1="16" y1="0" x2="496" y2="0">
       <stop offset="0%"   stop-color="#4338ca" stop-opacity="0.92"/>
       <stop offset="50%"  stop-color="#6366f1" stop-opacity="0.96"/>
       <stop offset="100%" stop-color="#312e81" stop-opacity="0.92"/>
     </linearGradient>
-    <linearGradient id="warpHi" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="432">
+    <linearGradient id="warpHi" gradientUnits="userSpaceOnUse" x1="0" y1="16" x2="0" y2="496">
       <stop offset="0%"   stop-color="#c7d2fe" stop-opacity="0"/>
       <stop offset="35%"  stop-color="#e0e7ff" stop-opacity="0.55"/>
       <stop offset="65%"  stop-color="#a5b4fc" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="weftHi" gradientUnits="userSpaceOnUse" x1="80" y1="0" x2="432" y2="0">
+    <linearGradient id="weftHi" gradientUnits="userSpaceOnUse" x1="16" y1="0" x2="496" y2="0">
       <stop offset="0%"   stop-color="#c7d2fe" stop-opacity="0"/>
       <stop offset="35%"  stop-color="#e0e7ff" stop-opacity="0.5"/>
       <stop offset="65%"  stop-color="#a5b4fc" stop-opacity="0.4"/>
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Soft edge: a heavily Gaussian-blurred circle as the alpha mask.
-         The weave emerges at full opacity in the middle and dissolves into
-         the backdrop at the edges with no hard boundary. -->
+    <!-- Mask: bright blurred center + a radial "ghost" floor that itself fades to 0 at the corners.
+         So the weave is brightest in the middle, dissolves into a dim ghost around it,
+         and that ghost fades into darkness at the tile edges. -->
     <filter id="edgeBlur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="22"/>
+      <feGaussianBlur stdDeviation="25"/>
     </filter>
+    <radialGradient id="ghostFalloff" gradientUnits="userSpaceOnUse" cx="256" cy="256" r="300">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.17"/>
+      <stop offset="45%"  stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
     <mask id="weaveFade">
-      <circle cx="256" cy="256" r="145" fill="#ffffff" filter="url(#edgeBlur)"/>
+      <rect width="512" height="512" fill="url(#ghostFalloff)"/>
+      <circle cx="256" cy="256" r="168" fill="#ffffff" filter="url(#edgeBlur)"/>
     </mask>
 
-    <!-- Subtle top-left glint over the whole piece -->
     <radialGradient id="glint" cx="32%" cy="28%" r="38%">
       <stop offset="0%"   stop-color="#c7d2fe" stop-opacity="0.14"/>
       <stop offset="70%"  stop-color="#c7d2fe" stop-opacity="0"/>
     </radialGradient>
   </defs>
 
-  <!-- Tile -->
   <rect width="512" height="512" rx="96" ry="96" fill="url(#bg)"/>
-
-  <!-- Inner glow (behind the weave) -->
   <rect width="512" height="512" fill="url(#innerGlow)"/>
 
-  <!-- Weave group: rotated 45°, softly masked so it blurs into the backdrop. -->
+  <!-- Weave: 11×11 threads at spacing 48, positions 16,64,112,160,208,256,304,352,400,448,496.
+       Rotated 45°. Masked so the center is bright and the rest is a dim ghost. -->
   <g mask="url(#weaveFade)" transform="rotate(45 256 256)">
-    <!-- Columns (warps) x: 112,160,208,256,304,352,400
-         Rows (wefts)    y: 112,160,208,256,304,352,400
-         Thread width 14, overlap width 32 for over-segments. -->
-
-    <!-- Layer 1: wefts underneath -->
+    <!-- Wefts under -->
     <g stroke="url(#weft)" stroke-width="14" stroke-linecap="round">
-      <line x1="80" y1="112" x2="432" y2="112"/>
-      <line x1="80" y1="160" x2="432" y2="160"/>
-      <line x1="80" y1="208" x2="432" y2="208"/>
-      <line x1="80" y1="256" x2="432" y2="256"/>
-      <line x1="80" y1="304" x2="432" y2="304"/>
-      <line x1="80" y1="352" x2="432" y2="352"/>
-      <line x1="80" y1="400" x2="432" y2="400"/>
+      <line x1="16" y1="16"  x2="496" y2="16"/>
+      <line x1="16" y1="64"  x2="496" y2="64"/>
+      <line x1="16" y1="112" x2="496" y2="112"/>
+      <line x1="16" y1="160" x2="496" y2="160"/>
+      <line x1="16" y1="208" x2="496" y2="208"/>
+      <line x1="16" y1="256" x2="496" y2="256"/>
+      <line x1="16" y1="304" x2="496" y2="304"/>
+      <line x1="16" y1="352" x2="496" y2="352"/>
+      <line x1="16" y1="400" x2="496" y2="400"/>
+      <line x1="16" y1="448" x2="496" y2="448"/>
+      <line x1="16" y1="496" x2="496" y2="496"/>
     </g>
     <g stroke="url(#weftHi)" stroke-width="4" stroke-linecap="round">
-      <line x1="80" y1="108" x2="432" y2="108"/>
-      <line x1="80" y1="156" x2="432" y2="156"/>
-      <line x1="80" y1="204" x2="432" y2="204"/>
-      <line x1="80" y1="252" x2="432" y2="252"/>
-      <line x1="80" y1="300" x2="432" y2="300"/>
-      <line x1="80" y1="348" x2="432" y2="348"/>
-      <line x1="80" y1="396" x2="432" y2="396"/>
+      <line x1="16" y1="12"  x2="496" y2="12"/>
+      <line x1="16" y1="60"  x2="496" y2="60"/>
+      <line x1="16" y1="108" x2="496" y2="108"/>
+      <line x1="16" y1="156" x2="496" y2="156"/>
+      <line x1="16" y1="204" x2="496" y2="204"/>
+      <line x1="16" y1="252" x2="496" y2="252"/>
+      <line x1="16" y1="300" x2="496" y2="300"/>
+      <line x1="16" y1="348" x2="496" y2="348"/>
+      <line x1="16" y1="396" x2="496" y2="396"/>
+      <line x1="16" y1="444" x2="496" y2="444"/>
+      <line x1="16" y1="492" x2="496" y2="492"/>
     </g>
 
-    <!-- Layer 2: warps on top -->
+    <!-- Warps on top -->
     <g stroke="url(#warp)" stroke-width="14" stroke-linecap="round">
-      <line x1="112" y1="80" x2="112" y2="432"/>
-      <line x1="160" y1="80" x2="160" y2="432"/>
-      <line x1="208" y1="80" x2="208" y2="432"/>
-      <line x1="256" y1="80" x2="256" y2="432"/>
-      <line x1="304" y1="80" x2="304" y2="432"/>
-      <line x1="352" y1="80" x2="352" y2="432"/>
-      <line x1="400" y1="80" x2="400" y2="432"/>
+      <line x1="16"  y1="16" x2="16"  y2="496"/>
+      <line x1="64"  y1="16" x2="64"  y2="496"/>
+      <line x1="112" y1="16" x2="112" y2="496"/>
+      <line x1="160" y1="16" x2="160" y2="496"/>
+      <line x1="208" y1="16" x2="208" y2="496"/>
+      <line x1="256" y1="16" x2="256" y2="496"/>
+      <line x1="304" y1="16" x2="304" y2="496"/>
+      <line x1="352" y1="16" x2="352" y2="496"/>
+      <line x1="400" y1="16" x2="400" y2="496"/>
+      <line x1="448" y1="16" x2="448" y2="496"/>
+      <line x1="496" y1="16" x2="496" y2="496"/>
     </g>
     <g stroke="url(#warpHi)" stroke-width="4" stroke-linecap="round">
-      <line x1="108" y1="80" x2="108" y2="432"/>
-      <line x1="156" y1="80" x2="156" y2="432"/>
-      <line x1="204" y1="80" x2="204" y2="432"/>
-      <line x1="252" y1="80" x2="252" y2="432"/>
-      <line x1="300" y1="80" x2="300" y2="432"/>
-      <line x1="348" y1="80" x2="348" y2="432"/>
-      <line x1="396" y1="80" x2="396" y2="432"/>
+      <line x1="12"  y1="16" x2="12"  y2="496"/>
+      <line x1="60"  y1="16" x2="60"  y2="496"/>
+      <line x1="108" y1="16" x2="108" y2="496"/>
+      <line x1="156" y1="16" x2="156" y2="496"/>
+      <line x1="204" y1="16" x2="204" y2="496"/>
+      <line x1="252" y1="16" x2="252" y2="496"/>
+      <line x1="300" y1="16" x2="300" y2="496"/>
+      <line x1="348" y1="16" x2="348" y2="496"/>
+      <line x1="396" y1="16" x2="396" y2="496"/>
+      <line x1="444" y1="16" x2="444" y2="496"/>
+      <line x1="492" y1="16" x2="492" y2="496"/>
     </g>
 
-    <!-- Layer 3: weft-over segments at (col+row) even crossings -->
+    <!-- Weft-over segments at (col+row) even crossings. Rows indexed 0..10 by y/48.
+         Cols 0,2,4,6,8,10 for even rows; 1,3,5,7,9 for odd rows.
+         Each segment center = (col_x, row_y), half-width 16. -->
     <g stroke="url(#weft)" stroke-width="14" stroke-linecap="round">
-      <line x1="96"  y1="112" x2="128" y2="112"/><line x1="192" y1="112" x2="224" y2="112"/><line x1="288" y1="112" x2="320" y2="112"/><line x1="384" y1="112" x2="416" y2="112"/>
-      <line x1="144" y1="160" x2="176" y2="160"/><line x1="240" y1="160" x2="272" y2="160"/><line x1="336" y1="160" x2="368" y2="160"/>
-      <line x1="96"  y1="208" x2="128" y2="208"/><line x1="192" y1="208" x2="224" y2="208"/><line x1="288" y1="208" x2="320" y2="208"/><line x1="384" y1="208" x2="416" y2="208"/>
-      <line x1="144" y1="256" x2="176" y2="256"/><line x1="240" y1="256" x2="272" y2="256"/><line x1="336" y1="256" x2="368" y2="256"/>
-      <line x1="96"  y1="304" x2="128" y2="304"/><line x1="192" y1="304" x2="224" y2="304"/><line x1="288" y1="304" x2="320" y2="304"/><line x1="384" y1="304" x2="416" y2="304"/>
-      <line x1="144" y1="352" x2="176" y2="352"/><line x1="240" y1="352" x2="272" y2="352"/><line x1="336" y1="352" x2="368" y2="352"/>
-      <line x1="96"  y1="400" x2="128" y2="400"/><line x1="192" y1="400" x2="224" y2="400"/><line x1="288" y1="400" x2="320" y2="400"/><line x1="384" y1="400" x2="416" y2="400"/>
-    </g>
-    <g stroke="url(#weftHi)" stroke-width="4" stroke-linecap="round">
-      <line x1="96"  y1="108" x2="128" y2="108"/><line x1="192" y1="108" x2="224" y2="108"/><line x1="288" y1="108" x2="320" y2="108"/><line x1="384" y1="108" x2="416" y2="108"/>
-      <line x1="144" y1="156" x2="176" y2="156"/><line x1="240" y1="156" x2="272" y2="156"/><line x1="336" y1="156" x2="368" y2="156"/>
-      <line x1="96"  y1="204" x2="128" y2="204"/><line x1="192" y1="204" x2="224" y2="204"/><line x1="288" y1="204" x2="320" y2="204"/><line x1="384" y1="204" x2="416" y2="204"/>
-      <line x1="144" y1="252" x2="176" y2="252"/><line x1="240" y1="252" x2="272" y2="252"/><line x1="336" y1="252" x2="368" y2="252"/>
-      <line x1="96"  y1="300" x2="128" y2="300"/><line x1="192" y1="300" x2="224" y2="300"/><line x1="288" y1="300" x2="320" y2="300"/><line x1="384" y1="300" x2="416" y2="300"/>
-      <line x1="144" y1="348" x2="176" y2="348"/><line x1="240" y1="348" x2="272" y2="348"/><line x1="336" y1="348" x2="368" y2="348"/>
-      <line x1="96"  y1="396" x2="128" y2="396"/><line x1="192" y1="396" x2="224" y2="396"/><line x1="288" y1="396" x2="320" y2="396"/><line x1="384" y1="396" x2="416" y2="396"/>
+      <!-- Row 0 y=16 -->
+      <line x1="0"  y1="16" x2="32"  y2="16"/><line x1="96"  y1="16" x2="128" y2="16"/><line x1="192" y1="16" x2="224" y2="16"/><line x1="288" y1="16" x2="320" y2="16"/><line x1="384" y1="16" x2="416" y2="16"/><line x1="480" y1="16" x2="512" y2="16"/>
+      <!-- Row 1 y=64 -->
+      <line x1="48"  y1="64" x2="80"  y2="64"/><line x1="144" y1="64" x2="176" y2="64"/><line x1="240" y1="64" x2="272" y2="64"/><line x1="336" y1="64" x2="368" y2="64"/><line x1="432" y1="64" x2="464" y2="64"/>
+      <!-- Row 2 y=112 -->
+      <line x1="0"  y1="112" x2="32"  y2="112"/><line x1="96"  y1="112" x2="128" y2="112"/><line x1="192" y1="112" x2="224" y2="112"/><line x1="288" y1="112" x2="320" y2="112"/><line x1="384" y1="112" x2="416" y2="112"/><line x1="480" y1="112" x2="512" y2="112"/>
+      <!-- Row 3 y=160 -->
+      <line x1="48"  y1="160" x2="80"  y2="160"/><line x1="144" y1="160" x2="176" y2="160"/><line x1="240" y1="160" x2="272" y2="160"/><line x1="336" y1="160" x2="368" y2="160"/><line x1="432" y1="160" x2="464" y2="160"/>
+      <!-- Row 4 y=208 -->
+      <line x1="0"  y1="208" x2="32"  y2="208"/><line x1="96"  y1="208" x2="128" y2="208"/><line x1="192" y1="208" x2="224" y2="208"/><line x1="288" y1="208" x2="320" y2="208"/><line x1="384" y1="208" x2="416" y2="208"/><line x1="480" y1="208" x2="512" y2="208"/>
+      <!-- Row 5 y=256 -->
+      <line x1="48"  y1="256" x2="80"  y2="256"/><line x1="144" y1="256" x2="176" y2="256"/><line x1="240" y1="256" x2="272" y2="256"/><line x1="336" y1="256" x2="368" y2="256"/><line x1="432" y1="256" x2="464" y2="256"/>
+      <!-- Row 6 y=304 -->
+      <line x1="0"  y1="304" x2="32"  y2="304"/><line x1="96"  y1="304" x2="128" y2="304"/><line x1="192" y1="304" x2="224" y2="304"/><line x1="288" y1="304" x2="320" y2="304"/><line x1="384" y1="304" x2="416" y2="304"/><line x1="480" y1="304" x2="512" y2="304"/>
+      <!-- Row 7 y=352 -->
+      <line x1="48"  y1="352" x2="80"  y2="352"/><line x1="144" y1="352" x2="176" y2="352"/><line x1="240" y1="352" x2="272" y2="352"/><line x1="336" y1="352" x2="368" y2="352"/><line x1="432" y1="352" x2="464" y2="352"/>
+      <!-- Row 8 y=400 -->
+      <line x1="0"  y1="400" x2="32"  y2="400"/><line x1="96"  y1="400" x2="128" y2="400"/><line x1="192" y1="400" x2="224" y2="400"/><line x1="288" y1="400" x2="320" y2="400"/><line x1="384" y1="400" x2="416" y2="400"/><line x1="480" y1="400" x2="512" y2="400"/>
+      <!-- Row 9 y=448 -->
+      <line x1="48"  y1="448" x2="80"  y2="448"/><line x1="144" y1="448" x2="176" y2="448"/><line x1="240" y1="448" x2="272" y2="448"/><line x1="336" y1="448" x2="368" y2="448"/><line x1="432" y1="448" x2="464" y2="448"/>
+      <!-- Row 10 y=496 -->
+      <line x1="0"  y1="496" x2="32"  y2="496"/><line x1="96"  y1="496" x2="128" y2="496"/><line x1="192" y1="496" x2="224" y2="496"/><line x1="288" y1="496" x2="320" y2="496"/><line x1="384" y1="496" x2="416" y2="496"/><line x1="480" y1="496" x2="512" y2="496"/>
     </g>
   </g>
 
-  <!-- Soft top-left glint over the whole composition -->
   <rect width="512" height="512" fill="url(#glint)"/>
 </svg>

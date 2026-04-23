@@ -6,6 +6,8 @@
 
 Weaves Linear into your automated agent-team workflow.
 
+Delegate with confidence. You pick the team — roles like Lead, Architect, Security, QA, or Scribe, shaped to your project through the `build-team` interview and given their own voice, stake, and standards. Every request then passes through the personas you assembled: they sign off on the plan, proofread the dispatch prompt, and peer-review every handoff before the work reaches the subagent that executes it. You stay in the loop at the one decision that matters: the explicit `dispatch-ok` label that releases the work to run.
+
 A Claude Code starter kit that turns any Linear issue into a reviewed PR through a personality-driven dev-team meeting, a paranoid dispatch-review gate, and a single subagent execution pass.
 
 ```
