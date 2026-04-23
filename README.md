@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/social-preview.png" alt="loom — weaves Linear into your automated agent-team workflow" width="100%"/>
+</p>
+
 # loom
 
 Weaves Linear into your automated agent-team workflow.
