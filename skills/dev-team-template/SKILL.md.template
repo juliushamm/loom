@@ -27,8 +27,8 @@ Seven personas. Use this skill whenever the user wants a multi-perspective desig
 
 1. **Foreman/Lead opens** — frames the question, names the scope.
 2. **Focused discussion** — only agents whose expertise applies. No round-robin. Push back, build on each other, cite concrete things.
-3. **Lead closes** — calls the decision, names the next step, names the executor.
-4. **Scribe outputs the dispatch prompt** — a self-contained subagent brief with goal, context, scope, verification, out-of-scope, output format.
+3. **Lead closes** — calls the decision, names the next step, names the executor, **and declares the deliverable type** as a single line: `Deliverable: CODE` (a PR) or `Deliverable: LINEAR DOCUMENT` (a spec/plan on a named project).
+4. **Scribe outputs the dispatch prompt** — chooses one of two templates based on Lead's declaration: a CODE-shaped brief (goal/context/scope/verification/out-of-scope, opens a PR) or a LINEAR DOCUMENT brief (creates/updates a doc via Linear MCP, returns a URL, no filesystem writes).
 
 ## When to use this skill
 

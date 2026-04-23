@@ -78,9 +78,9 @@ What happens:
 2. **Meeting.** Your team personas convene in-character. Lead opens, relevant agents speak, Lead closes with a decision.
 3. **Scribe posts the dispatch prompt** to Linear as a comment, tagged `automation:dispatch-pending-review`.
 4. **You review the prompt** in Linear. Apply `automation:dispatch-ok` to proceed, `automation:dispatch-reject` to send it back for revision.
-5. **Execution.** Loom dispatches a subagent with the approved prompt. The subagent opens a PR before returning.
-6. **CI poll.** Loom watches for CI to go green (or red).
-7. **Hand-off.** On green, loom posts `automation:awaiting-merge` and stops. You review the diff and merge the PR manually.
+5. **Execution.** Loom dispatches a subagent with the approved prompt. **Code deliverables**: the subagent opens a PR before returning. **Linear-Document deliverables** (Lead declared `Deliverable: LINEAR DOCUMENT` in step 2): the subagent creates a Linear Document on the named project via the Linear MCP and returns the Document URL — no PR, no file on disk.
+6. **CI poll** (code path) **or document hand-off** (document path). For code, loom watches CI to go green (or red). For documents, loom posts the URL and exits — there's no CI to poll.
+7. **Hand-off.** Code path: on green, loom posts `automation:awaiting-merge` and stops; you review the diff and merge the PR manually. Document path: loom posts `automation:awaiting-review` with the Document URL; you review the doc, sign off in-document, and move the issue state when done.
 8. **Cleanup.** Loom releases the in-flight lock and removes the heartbeat label.
 
 ## Troubleshooting
