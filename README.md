@@ -37,7 +37,7 @@ Then run `/work YOUR-123` on any Linear issue.
 ## What you get
 
 - **`loom` CLI** — `@juliushamm/loom` on npm. Five pipeline subcommands (`preflight`, `poll-dispatch`, `poll-ci`, `merge-gate`, `cleanup`) plus three setup subcommands (`init`, `labels`, `doctor`).
-- **`/work` skill** — Claude Code skill that orchestrates the full pipeline. Reads config from `.loom.json`.
+- **`/work` skill** — Claude Code skill that orchestrates the full pipeline. Reads config from `.loom.json`. Supports two deliverable shapes: **code** (subagent opens a PR; CI is polled) and **Linear Document** (subagent creates/updates a doc on the named project via the Linear MCP; no PR, no file writes).
 - **Dev-team template** — a seven-persona skeleton (Lead, Architect, Frontend, Backend, Security, QA, Scribe) that the `build-team` skill fills in via an interactive interview.
 
 ## Prerequisites

@@ -34,7 +34,7 @@ If both `dispatch-ok` and `dispatch-reject` are present on the issue simultaneou
 - **Scope** — exact files/directories that may be touched. Explicit list beats "the relevant code."
 - **Verification** — commands that prove it works. `npm test`, `npm run typecheck`, `npm run lint`, plus any feature-specific manual step.
 - **Out of scope** — an explicit list of things the subagent must NOT do. Often the most valuable section — catches scope creep before it starts.
-- **Output format** — what the subagent returns to the orchestrator (diff, log, PR URL).
+- **Output format** — what the subagent returns to the orchestrator. For code deliverables: diff + PR URL. For Linear-Document deliverables: the Document URL on the named project (no filesystem writes).
 
 **Red flags:**
 

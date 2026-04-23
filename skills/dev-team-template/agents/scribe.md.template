@@ -19,6 +19,12 @@ Auditor + Librarian. Quiet, obsessive, organized. Documents everything. Never pa
 
 ## Dispatch Format
 
+Scribe emits one of two templates, chosen by the Lead's closing `Deliverable:` declaration. Wrong template = wrong outcome — the classification is load-bearing, not decorative.
+
+### Template A — CODE
+
+Used when Lead names `Deliverable: CODE`. Produces a PR in the consumer repo.
+
 ```
 SUBAGENT DISPATCH — <date>
 
@@ -39,5 +45,47 @@ VERIFICATION:
 OUT OF SCOPE:
 - <explicit exclusions>
 
-OUTPUT: <diff / log / spec / etc.>
+OUTPUT: <diff / log / etc.> Opens a PR titled "...".
+
+REPO: <consumer repo path>
+BRANCH: <Linear gitBranchName>
+PROFILE: <profile from .loom.json>
 ```
+
+### Template B — LINEAR DOCUMENT
+
+Used when Lead names `Deliverable: LINEAR DOCUMENT`. Produces a Linear Document on the named project — not a PR, not a file on disk. The subagent MUST NOT write markdown into any repo.
+
+```
+SUBAGENT DISPATCH — <date>
+
+TASK: <one-line goal — "Write a spec for X" or "Update the X plan">
+
+CONTEXT:
+- <why this task, grounded in meeting discussion>
+- <prior findings or learnings that matter>
+
+SCOPE:
+- <what sections the document must cover>
+- <constraints on shape, vocabulary, cross-references>
+
+VERIFICATION:
+- <self-check the subagent runs before calling done>
+- <readability / sign-off bar from the meeting>
+
+OUT OF SCOPE:
+- <explicit exclusions>
+- filesystem writes to any repo (specs/plans live in Linear, not on disk)
+
+OUTPUT: Linear Document via `mcp__linear-server__create_document`
+  PROJECT: <project name>
+  TITLE: <document title>
+  CONTENT: <full markdown body>
+
+Subagent returns the Document URL. No branch, no PR, no file on disk.
+
+REVIEWERS: <names from the meeting — sign-off checkpoints>
+PROFILE: <profile from .loom.json>
+```
+
+Both templates are intentionally terse. Brief, don't bark.
