@@ -39,21 +39,15 @@
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
 
-    <!-- Softer vignette (weakened 50%): edges sit at ~50% opacity instead of fully fading.
-         A clipPath enforces the circular silhouette so the rotated square's corners
-         never peek through. -->
-    <radialGradient id="fadeMask" gradientUnits="userSpaceOnUse" cx="256" cy="256" r="170">
-      <stop offset="0%"    stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="60%"   stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="88%"   stop-color="#ffffff" stop-opacity="0.725"/>
-      <stop offset="100%"  stop-color="#ffffff" stop-opacity="0.5"/>
-    </radialGradient>
+    <!-- Soft edge: a heavily Gaussian-blurred circle as the alpha mask.
+         The weave emerges at full opacity in the middle and dissolves into
+         the backdrop at the edges with no hard boundary. -->
+    <filter id="edgeBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
     <mask id="weaveFade">
-      <rect width="512" height="512" fill="url(#fadeMask)"/>
+      <circle cx="256" cy="256" r="145" fill="#ffffff" filter="url(#edgeBlur)"/>
     </mask>
-    <clipPath id="weaveClip">
-      <circle cx="256" cy="256" r="170"/>
-    </clipPath>
 
     <!-- Subtle top-left glint over the whole piece -->
     <radialGradient id="glint" cx="32%" cy="28%" r="38%">
@@ -68,8 +62,8 @@
   <!-- Inner glow (behind the weave) -->
   <rect width="512" height="512" fill="url(#innerGlow)"/>
 
-  <!-- Weave group: rotated 45°, softly vignetted via mask, clipped to a circle. -->
-  <g mask="url(#weaveFade)" clip-path="url(#weaveClip)" transform="rotate(45 256 256)">
+  <!-- Weave group: rotated 45°, softly masked so it blurs into the backdrop. -->
+  <g mask="url(#weaveFade)" transform="rotate(45 256 256)">
     <!-- Columns (warps) x: 112,160,208,256,304,352,400
          Rows (wefts)    y: 112,160,208,256,304,352,400
          Thread width 14, overlap width 32 for over-segments. -->

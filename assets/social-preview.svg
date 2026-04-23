@@ -38,18 +38,13 @@
       <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
     </linearGradient>
 
-    <radialGradient id="fadeMask" gradientUnits="userSpaceOnUse" cx="360" cy="320" r="220">
-      <stop offset="0%"   stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="60%"  stop-color="#ffffff" stop-opacity="1"/>
-      <stop offset="88%"  stop-color="#ffffff" stop-opacity="0.725"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/>
-    </radialGradient>
+    <!-- Soft edge: heavily blurred circular mask — the weave dissolves into the backdrop -->
+    <filter id="edgeBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="28"/>
+    </filter>
     <mask id="weaveFade">
-      <rect width="1280" height="640" fill="url(#fadeMask)"/>
+      <circle cx="360" cy="320" r="185" fill="#ffffff" filter="url(#edgeBlur)"/>
     </mask>
-    <clipPath id="weaveClip">
-      <circle cx="360" cy="320" r="220"/>
-    </clipPath>
 
     <linearGradient id="text" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%"   stop-color="#e0e7ff"/>
@@ -60,8 +55,8 @@
   <rect width="1280" height="640" fill="url(#bg)"/>
   <rect width="1280" height="640" fill="url(#innerGlow)"/>
 
-  <!-- Woven icon, centered at (360, 320), radius ~220 -->
-  <g mask="url(#weaveFade)" clip-path="url(#weaveClip)" transform="rotate(45 360 320)">
+  <!-- Woven icon, centered at (360, 320), softly masked into the backdrop -->
+  <g mask="url(#weaveFade)" transform="rotate(45 360 320)">
     <g stroke="url(#weft)" stroke-width="16" stroke-linecap="round">
       <line x1="140" y1="152" x2="580" y2="152"/>
       <line x1="140" y1="208" x2="580" y2="208"/>
