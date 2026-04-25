@@ -20,6 +20,7 @@ export type ExtendedLinearClient = LinearClient & {
     teamId: string,
     opts?: { color?: string; description?: string }
   ): Promise<LinearLabelSummary>
+  getIssueDescription(issueId: string): Promise<string>
 }
 
 export function linearApiClient(apiKey = process.env.LINEAR_API_KEY): ExtendedLinearClient {
@@ -88,6 +89,11 @@ export function linearApiClient(apiKey = process.env.LINEAR_API_KEY): ExtendedLi
       )?.issueLabel
       if (!created) throw new Error(`Linear: createLabel(${name}) returned no issueLabel`)
       return { id: created.id, name: created.name, color: created.color }
+    },
+    async getIssueDescription(issueId) {
+      const data = await gql(auth, ISSUE_DESCRIPTION_QUERY, { id: issueId })
+      const issue = data.issue as { description?: string | null } | null
+      return issue?.description ?? ''
     }
   }
 }
@@ -132,3 +138,4 @@ const CREATE_COMMENT_MUTATION = `mutation ($input: CommentCreateInput!) { commen
 const TEAMS_QUERY = `query { teams(first: 100) { nodes { id key name } } }`
 const TEAM_LABELS_QUERY = `query ($id: String!) { team(id: $id) { labels(first: 250) { nodes { id name color } } } }`
 const CREATE_LABEL_MUTATION = `mutation ($input: IssueLabelCreateInput!) { issueLabelCreate(input: $input) { issueLabel { id name color } } }`
+const ISSUE_DESCRIPTION_QUERY = `query ($id: String!) { issue(id: $id) { description } }`

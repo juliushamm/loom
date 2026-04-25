@@ -7,13 +7,19 @@ export const DISPATCH_REVIEW_TIMEOUT_MS = 86_400_000 // 24h
 export const MERGE_REVIEW_TIMEOUT_MS = 86_400_000 // 24h
 export const LABEL_STALE_TTL_MS = 14_400_000 // 4h — heartbeat-refreshed
 
-export type ProfileName = 'aggressive' | 'balanced' | 'paranoid' | 'balanced+paranoid-step-3'
+export type ProfileName =
+  | 'aggressive'
+  | 'balanced'
+  | 'paranoid'
+  | 'balanced+paranoid-step-3'
+  | 'balanced+self-checking'
 
 export const PROFILE_NAMES: readonly ProfileName[] = [
   'aggressive',
   'balanced',
   'paranoid',
-  'balanced+paranoid-step-3'
+  'balanced+paranoid-step-3',
+  'balanced+self-checking'
 ] as const
 
 export type GateConfig = {
@@ -26,7 +32,10 @@ const PROFILES: Record<ProfileName, Omit<GateConfig, 'name'>> = {
   aggressive: { dispatchReviewGate: false, mergeGate: false },
   balanced: { dispatchReviewGate: false, mergeGate: true },
   paranoid: { dispatchReviewGate: true, mergeGate: true },
-  'balanced+paranoid-step-3': { dispatchReviewGate: true, mergeGate: true }
+  'balanced+paranoid-step-3': { dispatchReviewGate: true, mergeGate: true },
+  // Default for the self-checking flow: the dispatch-review gate is replaced
+  // by §4.5 scope-arm + §5.5 diff-verify, so no human gate fires inline.
+  'balanced+self-checking': { dispatchReviewGate: false, mergeGate: true }
 }
 
 export function resolveProfile(name?: string): GateConfig {

@@ -21,6 +21,9 @@ function mockGit(overrides: Partial<GitClient> = {}): GitClient {
     async listCommitsAhead() {
       return 0
     },
+    async diffNamesAgainstMain() {
+      return []
+    },
     ...overrides
   }
 }

@@ -9,6 +9,12 @@ export type GhClient = {
 export type GitClient = {
   lsRemoteBranches(pattern: string): Promise<string[]>
   listCommitsAhead(branch: string, base: string): Promise<number>
+  /**
+   * Returns paths from `git diff --name-only <main>...HEAD`. Used by the
+   * §5.5 diff-verify gate. `mainBranch` defaults to "main" — callers should
+   * pass `cfg.git.mainBranch`.
+   */
+  diffNamesAgainstMain(mainBranch?: string): Promise<string[]>
 }
 
 export type PullRequestSummary = {

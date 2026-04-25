@@ -52,7 +52,14 @@ describe('runtime-config (timing + gate profiles)', () => {
       'aggressive',
       'balanced',
       'paranoid',
-      'balanced+paranoid-step-3'
+      'balanced+paranoid-step-3',
+      'balanced+self-checking'
     ])
+  })
+
+  it('balanced+self-checking has dispatch gate off and merge gate on', () => {
+    const g = resolveProfile('balanced+self-checking')
+    expect(g.dispatchReviewGate).toBe(false)
+    expect(g.mergeGate).toBe(true)
   })
 })

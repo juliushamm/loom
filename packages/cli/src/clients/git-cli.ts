@@ -22,6 +22,17 @@ export function gitCliClient(): GitClient {
         `origin/${base}..origin/${branch}`
       ])
       return parseInt(stdout.trim(), 10) || 0
+    },
+    async diffNamesAgainstMain(mainBranch = 'main') {
+      const { stdout } = await pExecFile('git', [
+        'diff',
+        '--name-only',
+        `${mainBranch}...HEAD`
+      ])
+      return stdout
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean)
     }
   }
 }

@@ -1,74 +1,101 @@
-# The dispatch-review gate
+# The dispatch-review gate (and its self-checking replacement)
 
-The single most important safety mechanism in loom: before any subagent executes, **a human reviews the exact prompt it will receive**.
+Loom ships two safety models for the moment between meeting and execution. Pick the one that matches how much you trust your dispatch prompts.
 
-This is sometimes called "paranoid step 3" — step 3 in the pipeline (execution) is gated by explicit human sign-off.
+| Profile | What guards execution? | Inline human prompts |
+|---|---|---|
+| `balanced+self-checking` (**default**) | §4.5 scope-arm + §5.5 diff-verify | none |
+| `paranoid` | §4 dispatch-review label gate | one — apply `dispatch-ok` |
+| `balanced+paranoid-step-3` | §4 dispatch-review label gate | one — apply `dispatch-ok` |
+| `balanced` | none | none |
+| `aggressive` | none | none |
 
-## Why
+Set the profile via `.loom.json`:
 
-Dispatch prompts are what actually drive the subagent. If the prompt is wrong, the PR is wrong. If the scope is too wide, the subagent goes off-piste. If verification criteria are fuzzy, the subagent ships something that looks done but isn't.
+```json
+{
+  "linear": { "teamKey": "YOUR" },
+  "pipeline": { "profile": "balanced+self-checking" }
+}
+```
 
-Reviewing the prompt is cheaper than reviewing the resulting 800-line PR, and lets you catch scope drift before any code is written.
+## `balanced+self-checking` — the default
 
-## How it works
+Two automated checks replace the human gate.
 
-1. **Meeting ends.** The Scribe persona in your team skill outputs a dispatch prompt.
+### §4.5 scope-arm
+
+After the meeting outputs a dispatch prompt, loom runs:
+
+```
+loom scope-arm <ISSUE>
+```
+
+This:
+
+1. Fetches the Linear issue's description.
+2. Extracts a path list from the `## Scope` section, a `**Files:**` callout, or a fenced ```files block (most-specific wins).
+3. Writes `~/.loom/fires/<ISSUE>/scope.json` with the paths plus a `bashAllow` list of routine commands (typecheck, test, build, gh pr create, etc.).
+
+The Tier 1 hooks read this marker. While it's armed:
+
+- **In-scope writes** are pre-approved — no per-file permission prompt.
+- **Out-of-scope writes** block with `scope-exceeded:<path>`.
+- **`bashAllow`-matching commands** are pre-approved — no per-command prompt.
+- **The global Tier 1 blocklist still wins** — even an in-scope path can't override a globally-blocked one (e.g. `CLAUDE.md`, `.env`, force-push).
+
+### §5.5 diff-verify
+
+Before the PR opens, loom runs:
+
+```
+loom diff-verify <ISSUE>
+```
+
+This walks `git diff --name-only main...HEAD` against `scope.json` plus a small set of hardcoded collateral rules (README in the same workspace, barrel `index.ts` next to in-scope files, mirrored test files for in-scope sources). Any file that doesn't match → halt with `scope-exceeded`. The feature branch persists for human triage; loom never auto-reverts.
+
+### Why this works
+
+Most dispatch-review approvals were rubber-stamps — the human reads a well-specced prompt, sees it matches the scope, types ok. Replacing that with a parser + diff-verifier removes the mid-fire prompt while keeping the safety: the verifier catches scope drift either as it happens (hook block) or before the PR opens (diff-verify).
+
+The cost when it goes wrong: one wasted subagent fire if the dispatch is misinterpreted in a way the parser doesn't catch. Acceptable for solo-dev / small-team cadence; the branch is preserved so you can salvage anything useful.
+
+## `paranoid` — the legacy gate
+
+Use this for fires where the spec is genuinely ambiguous and you want a human to read the dispatch prompt before any subagent work runs.
+
+1. **Meeting ends.** Scribe outputs a dispatch prompt.
 2. **Loom posts the prompt** as a Linear comment prefixed `🟡 automation:dispatch-pending-review`.
-3. **Loom runs** `loom poll-dispatch <ISSUE>`. The CLI blocks, polling the issue's labels every 30 seconds.
+3. **Loom runs** `loom poll-dispatch <ISSUE>`. The CLI blocks, polling labels every 30 seconds.
 4. **You read the prompt** in Linear. Three choices:
-   - Apply **`automation:dispatch-ok`** → the CLI exits 0 with stdout `dispatch-ok`. Loom continues to execution.
-   - Apply **`automation:dispatch-reject`** → the CLI exits 5 with stdout `dispatch-reject`. Loom pauses, reads your comment thread for your reason, revises the dispatch, removes the reject label, and re-posts.
-   - Apply **`automation:halt`** or **`automation:halt-all`** → the CLI exits 3 with stdout `HALT <reason>`. Loom jumps to cleanup and stops.
-5. **Timeout** → after 24 hours of neither label applied, the CLI exits 3. Safe default — the pipeline gives up on stale reviews.
+   - Apply **`automation:dispatch-ok`** → CLI exits 0; loom continues.
+   - Apply **`automation:dispatch-reject`** → CLI exits 5; loom revises and re-posts.
+   - Apply **`automation:halt`** → CLI exits 3; loom cleans up.
+5. **Timeout** — 24 hours of neither label applied → CLI exits 3.
 
-## Reject-before-ok
+When both `dispatch-ok` and `dispatch-reject` are present simultaneously, **reject wins**.
 
-If both `dispatch-ok` and `dispatch-reject` are present on the issue simultaneously (two people racing the labels, or an accidental double-click), **reject wins**. Rationale: a false positive on reject costs one revision cycle; a false positive on ok costs a wrong PR.
-
-## What to look for when reviewing
+## What to look for when reviewing a dispatch (paranoid only)
 
 **Good dispatch prompts have:**
 
 - **Goal** — one-line statement of what the PR should achieve.
-- **Context** — relevant findings from the meeting (not a transcript; just the load-bearing conclusions).
-- **Scope** — exact files/directories that may be touched. Explicit list beats "the relevant code."
-- **Verification** — commands that prove it works. `npm test`, `npm run typecheck`, `npm run lint`, plus any feature-specific manual step.
-- **Out of scope** — an explicit list of things the subagent must NOT do. Often the most valuable section — catches scope creep before it starts.
-- **Output format** — what the subagent returns to the orchestrator. For code deliverables: diff + PR URL. For Linear-Document deliverables: the Document URL on the named project (no filesystem writes).
+- **Context** — the load-bearing conclusions from the meeting (not a transcript).
+- **Scope** — exact files/directories that may be touched.
+- **Verification** — commands that prove it works.
+- **Out of scope** — explicit list of things the subagent must NOT do.
+- **Output format** — what the subagent returns to the orchestrator.
 
-**Red flags:**
+**Red flags:** "and anything else you notice", "fix tests" without naming which ones, "optimize performance" as a goal, references to files the subagent hasn't been told about.
 
-- "…and anything else you notice" — invites drift.
-- "Fix tests" without naming which tests or why they fail.
-- No verification clause for destructive operations.
-- References to files the subagent hasn't been told about.
-- "Optimize performance" as a goal — unmeasurable, unbounded.
-
-If you see any of these, apply `automation:dispatch-reject` and comment with the specific ask. Loom will revise.
-
-## Profiles
-
-The `.loom.json` `pipeline.profile` field controls whether this gate fires:
-
-| Profile | Dispatch gate | Merge gate |
-|---|---|---|
-| `aggressive` | off | off |
-| `balanced` | off | on |
-| `paranoid` | on | on |
-| `balanced+paranoid-step-3` (default) | on | off |
-
-The default name is long for a reason: it's balanced everywhere except this step, which deliberately runs paranoid. We recommend keeping it.
-
-If you find yourself wanting `aggressive`, that's a signal your dispatch prompts aren't yet trustworthy enough to auto-dispatch. Fix the prompts first (improve Scribe's template, tighten your team's meeting discipline), then consider turning the gate off.
-
-## Revision loop
+## Revision loop (paranoid only)
 
 When you reject, loom will:
 
-1. Read every comment on the issue posted since the dispatch.
+1. Read every comment posted since the dispatch.
 2. Summarize your reason back in the revision.
-3. Remove the `automation:dispatch-reject` label via the Linear API.
-4. Post the revised dispatch as a new comment prefixed `🟡 automation:dispatch-pending-review (revised)`.
+3. Remove the `automation:dispatch-reject` label.
+4. Re-post the revised dispatch as `🟡 automation:dispatch-pending-review (revised)`.
 5. Re-run `loom poll-dispatch`.
 
 There is no revision count limit. Loop until you approve or halt.
@@ -77,12 +104,18 @@ There is no revision count limit. Loop until you approve or halt.
 
 | Code | Meaning |
 |---|---|
-| 0 | `dispatch-ok` — continue |
+| 0 | `dispatch-ok` (paranoid) or scope-allowed (default) — continue |
 | 3 | halt (label) or timeout |
 | 5 | `dispatch-reject` — revise and re-gate |
-
-Other subcommands use the same conventions. `poll-ci` adds `4` for red CI.
+| 6 | `scope-exceeded` from `diff-verify` — halt with offending paths |
 
 ## Telemetry
 
-Every gate outcome is recorded to `storage.logDir` with a timestamp, the issue ID, and the label that closed the gate. Useful for debugging a "why did this pipeline halt at 3am" question after the fact.
+Every gate outcome is recorded to `storage.logDir` with timestamp + issue ID. Useful for "why did this halt at 3am" forensics after the fact.
+
+## Picking a profile
+
+- **You write tight `## Scope` sections** → `balanced+self-checking`. You'll get zero mid-fire prompts on a well-specced issue.
+- **Your specs are still evolving and you want a human in the loop** → `paranoid`. One inline approval per fire is small overhead for a tight feedback loop.
+- **You want the safety net for the merge step but trust dispatch** → `balanced`. No dispatch gate, merge gate stays.
+- **You want both** → `balanced+paranoid-step-3` or `balanced+self-checking`. The two are mutually exclusive — pick one.
