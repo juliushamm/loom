@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { readFileSync } from 'node:fs'
 import {
   resolveProfile,
   defaultLogPath,
+  extractScope,
   loadConfig,
   resolveConfigPath,
   type LoomConfig
@@ -16,13 +18,16 @@ import {
   cleanup,
   initCmd,
   labelsCmd,
-  doctorCmd
+  doctorCmd,
+  scopeArm,
+  scopeDisarm,
+  diffVerify
 } from '../src/commands/index.js'
 import { ghCliClient, gitCliClient, linearApiClient } from '../src/clients/index.js'
 
 const pExecFile = promisify(execFile)
 
-type ExitCode = 0 | 1 | 2 | 3 | 4 | 5
+type ExitCode = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 const USAGE = `usage:
   loom init [--force]
@@ -33,8 +38,11 @@ const USAGE = `usage:
   loom poll-ci <PR> --issue <ISSUE>
   loom merge-gate <PR> --issue <ISSUE>
   loom cleanup <ISSUE>
+  loom scope-arm <ISSUE> [--from-description <path>]
+  loom scope-disarm <ISSUE>
+  loom diff-verify <ISSUE>
 
-Exit codes: 0 ok · 2 usage · 3 halt/timeout · 4 red-ci · 5 dispatch-reject`
+Exit codes: 0 ok · 2 usage · 3 halt/timeout · 4 red-ci · 5 dispatch-reject · 6 scope-exceeded`
 
 async function main(): Promise<ExitCode> {
   const [sub, ...rest] = process.argv.slice(2)
@@ -60,6 +68,12 @@ async function main(): Promise<ExitCode> {
       return runMergeGate(rest)
     case 'cleanup':
       return runCleanup(rest)
+    case 'scope-arm':
+      return runScopeArm(rest)
+    case 'scope-disarm':
+      return runScopeDisarm(rest)
+    case 'diff-verify':
+      return runDiffVerify(rest)
     default:
       console.error(`loom: unknown subcommand "${sub}"\n\n${USAGE}`)
       return 2
@@ -288,6 +302,71 @@ async function runMergeGate(args: string[]): Promise<ExitCode> {
   }
   console.log('TIMEOUT')
   return 3
+}
+
+async function runScopeArm(args: string[]): Promise<ExitCode> {
+  const cfg = loadConfig()
+  const issueId = issueArg(args, cfg.linear)
+  if (!issueId) {
+    console.error(`loom scope-arm: expected an issue like ${cfg.linear.teamKey}-123`)
+    return 2
+  }
+  const fromIdx = args.indexOf('--from-description')
+  let description: string
+  if (fromIdx !== -1) {
+    const fromPath = args[fromIdx + 1]
+    if (!fromPath) {
+      console.error('loom scope-arm: --from-description requires a path argument')
+      return 2
+    }
+    description = readFileSync(fromPath, 'utf8')
+  } else {
+    const apiKey = process.env[cfg.linear.apiKeyEnv]
+    if (!apiKey) {
+      console.error(
+        `loom scope-arm: ${cfg.linear.apiKeyEnv} is not set (or pass --from-description <path>)`
+      )
+      return 2
+    }
+    const linear = linearApiClient(apiKey)
+    description = await linear.getIssueDescription(issueId)
+  }
+  const extraction = extractScope(description)
+  const result = scopeArm({
+    issueId,
+    repo: cfg.repo.root,
+    scopeExtraction: extraction
+  })
+  console.log(JSON.stringify({ path: result.path, marker: result.marker }, null, 2))
+  return 0
+}
+
+async function runScopeDisarm(args: string[]): Promise<ExitCode> {
+  const cfg = loadConfig()
+  const issueId = issueArg(args, cfg.linear)
+  if (!issueId) {
+    console.error(`loom scope-disarm: expected an issue like ${cfg.linear.teamKey}-123`)
+    return 2
+  }
+  const result = scopeDisarm({ issueId })
+  console.log(JSON.stringify(result))
+  return 0
+}
+
+async function runDiffVerify(args: string[]): Promise<ExitCode> {
+  const cfg = loadConfig()
+  const issueId = issueArg(args, cfg.linear)
+  if (!issueId) {
+    console.error(`loom diff-verify: expected an issue like ${cfg.linear.teamKey}-123`)
+    return 2
+  }
+  const r = await diffVerify(
+    { issueId, repoRoot: cfg.repo.root },
+    { gitClient: gitCliClient(), mainBranch: cfg.git.mainBranch }
+  )
+  console.log(JSON.stringify(r))
+  if (r.kind === 'scope-exceeded') return 6
+  return 0
 }
 
 async function runCleanup(args: string[]): Promise<ExitCode> {

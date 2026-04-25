@@ -2,7 +2,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { homedir } from 'node:os'
 
-export type LoomProfile = 'aggressive' | 'balanced' | 'paranoid' | 'balanced+paranoid-step-3'
+export type LoomProfile =
+  | 'aggressive'
+  | 'balanced'
+  | 'paranoid'
+  | 'balanced+paranoid-step-3'
+  | 'balanced+self-checking'
 
 export type LoomConfig = {
   linear: { teamKey: string; apiKeyEnv: string }
@@ -50,7 +55,31 @@ const VALID_PROFILES: readonly LoomProfile[] = [
   'aggressive',
   'balanced',
   'paranoid',
-  'balanced+paranoid-step-3'
+  'balanced+paranoid-step-3',
+  'balanced+self-checking'
+]
+
+/**
+ * Default bash patterns pre-approved by `scope-arm` for the duration of a fire.
+ * These are convenience pre-approvals for routine pipeline work — they let an
+ * armed subagent run typecheck, test, lint, and PR-creation commands without
+ * tripping per-command permission prompts. The global Tier 1 bash blocklist
+ * (force-push, push to main, --no-verify, etc.) still wins above these.
+ */
+export const DEFAULT_BASH_ALLOW: readonly string[] = [
+  'npm ci',
+  'npm run typecheck',
+  'npm test',
+  'npm run lint',
+  'npm run build',
+  'git add *',
+  'git commit -m *',
+  'git status *',
+  'git diff *',
+  'git checkout *',
+  'git push -u origin *',
+  'gh pr create *',
+  'gh pr view *'
 ]
 
 export function expandTilde(p: string): string {

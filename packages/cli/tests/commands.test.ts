@@ -72,6 +72,9 @@ function mockGit(over: Partial<GitClient> = {}): GitClient {
     async listCommitsAhead() {
       return 0
     },
+    async diffNamesAgainstMain() {
+      return []
+    },
     ...over
   }
 }
@@ -473,6 +476,9 @@ function mockExtendedLinear(
     async createLabel(name) {
       created.push(name)
       return { id: `id-${name}`, name }
+    },
+    async getIssueDescription() {
+      return ''
     },
     ...over
   }

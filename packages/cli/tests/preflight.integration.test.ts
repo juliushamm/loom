@@ -34,6 +34,9 @@ function stubGit(): GitClient {
     },
     async listCommitsAhead() {
       return 0
+    },
+    async diffNamesAgainstMain() {
+      return []
     }
   }
 }

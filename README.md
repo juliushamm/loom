@@ -15,8 +15,9 @@ A Claude Code starter kit that turns any Linear issue into a reviewed PR through
   → pre-flight (branch state, halt signals)
   → team meeting (in-character, multi-agent)
   → Scribe emits dispatch prompt
-  → you review + apply dispatch-ok label
+  → scope-arm (default) OR dispatch-review gate (profile: paranoid)
   → subagent executes + opens PR
+  → diff-verify (default) — halts on out-of-scope files
   → CI polled → green → your turn to merge
 ```
 
@@ -42,7 +43,7 @@ Then run `/work YOUR-123` on any Linear issue.
 
 ## What you get
 
-- **`loom` CLI** — `@juliushamm/loom` on npm. Five pipeline subcommands (`preflight`, `poll-dispatch`, `poll-ci`, `merge-gate`, `cleanup`) plus three setup subcommands (`init`, `labels`, `doctor`).
+- **`loom` CLI** — `@juliushamm/loom` on npm. Eight pipeline subcommands (`preflight`, `poll-dispatch`, `poll-ci`, `merge-gate`, `cleanup`, `scope-arm`, `scope-disarm`, `diff-verify`) plus three setup subcommands (`init`, `labels`, `doctor`).
 - **`/work` skill** — Claude Code skill that orchestrates the full pipeline. Reads config from `.loom.json`. Supports two deliverable shapes: **code** (subagent opens a PR; CI is polled) and **Linear Document** (subagent creates/updates a doc on the named project via the Linear MCP; no PR, no file writes).
 - **Dev-team template** — a seven-persona skeleton (Lead, Architect, Frontend, Backend, Security, QA, Scribe) that the `build-team` skill fills in via an interactive interview.
 
@@ -67,15 +68,28 @@ Run `loom doctor` any time to check.
 
 Full schema: `schema/v1.json`. Every field other than `linear.teamKey` has a sane default.
 
-## The dispatch-review gate
+## The self-checking flow (default)
 
-Every `/work` run pauses before execution. Scribe posts the subagent dispatch prompt as a Linear comment, then `loom poll-dispatch` blocks. You read the prompt and choose:
+The `balanced+self-checking` profile (default) replaces the human dispatch-review gate with two automated checks:
+
+- **§4.5 scope-arm** — `loom scope-arm <ISSUE>` parses the issue's `## Scope` section into a fire-scoped allowlist at `~/.loom/fires/<ISSUE>/scope.json`. Tier 1 hooks honor the allowlist: in-scope writes don't prompt, out-of-scope writes block with `scope-exceeded:<path>`, and routine commands (`npm test`, `gh pr create`, etc.) are pre-approved.
+- **§5.5 diff-verify** — `loom diff-verify <ISSUE>` walks `git diff --name-only main...HEAD` against the allowlist plus collateral rules (README in the same workspace, barrel `index.ts` next to in-scope files, mirrored test files). Out-of-scope files halt the pipeline; the feature branch persists for human triage.
+
+Net effect on a well-specced issue: zero mid-fire prompts.
+
+The global Tier 1 blocklist (force-push, push-to-main, secrets-bearing paths) is **never** widened by scope-arm — it remains the ceiling.
+
+## The legacy dispatch-review gate (paranoid profile)
+
+For genuinely ambiguous fires, set `pipeline.profile = paranoid` in `.loom.json`. The legacy gate fires:
 
 - **Apply `automation:dispatch-ok` label** → orchestrator unblocks, dispatches the subagent.
-- **Apply `automation:dispatch-reject` label** → orchestrator treats as rejected, exits with code 5. Your comment on the issue becomes the revision brief; the orchestrator revises and re-posts.
+- **Apply `automation:dispatch-reject` label** → orchestrator revises the dispatch and re-posts.
 - **Apply `automation:halt` label** → kill-switch, cleanup runs.
 
 Reject evaluation precedes ok — if both labels are present, reject wins.
+
+See [`docs/dispatch-gate.md`](./docs/dispatch-gate.md) for the full profile matrix and selection guide.
 
 ## CLI reference
 
@@ -85,13 +99,16 @@ loom labels --ensure             Create automation:* labels in Linear
 loom labels --dry-run            Preview label creation
 loom doctor                      Env + Linear + gh + labels health check
 loom preflight   <ISSUE>         Print state machine JSON
-loom poll-dispatch <ISSUE>       Block until dispatch-ok / reject / halt
+loom poll-dispatch <ISSUE>       Block until dispatch-ok / reject / halt (paranoid profile)
+loom scope-arm   <ISSUE>         Write fire-scoped allowlist to ~/.loom/fires/<ISSUE>/scope.json
+loom scope-disarm <ISSUE>        Remove the allowlist (called by cleanup)
+loom diff-verify <ISSUE>         Walk git diff main...HEAD against scope.json
 loom poll-ci   <PR> --issue <ISSUE>   Block until CI settles
 loom merge-gate <PR> --issue <ISSUE>  Block until PR is merged
 loom cleanup   <ISSUE>           Release locks, remove in-flight label
 ```
 
-Exit codes: `0` ok, `2` usage, `3` halt/timeout, `4` red CI, `5` dispatch-reject.
+Exit codes: `0` ok, `2` usage, `3` halt/timeout, `4` red CI, `5` dispatch-reject, `6` scope-exceeded.
 
 ## Packaging layout
 
